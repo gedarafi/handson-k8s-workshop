@@ -1,0 +1,6 @@
+hub:
+  config:
+    DummyAuthenticator:
+      password: "123456"
+    JupyterHub:
+      authenticator_class: dummy

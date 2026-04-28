@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: model-small-downloader
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: model-small-downloader
+        image: raijenki/llamacpp:hfhub
+        command:
+          - "hf"
+        args:
+          - "download"
+          - "unsloth/Devstral-Small-2-24B-Instruct-2512-GGUF"
+          - "--local-dir"
+          - "/shared/models/Devstral-Small-2"
+          - "--include"
+          - "*BF16*"
+        resources:
+          requests:
+            memory: "5Gi"
+            cpu: "4000m"
+          limits:
+            cpu: "4000m"
+            memory: "5Gi"
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /shared
+      volumes:
+      - name: shared-volume
+        persistentVolumeClaim:
+          claimName: model-storage
