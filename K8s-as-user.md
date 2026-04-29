@@ -384,14 +384,41 @@ Source: shipit.dev
 
 25
 
-Let’s start our cluster and use our first kubectl
+26: Let’s start our cluster and use our first kubectl
+
 Create cluster in k3d:
+
+```bash
 sudo k3d cluster create my-cluster
+```
+
+## How to run kubectl as a non-root user?
+
+```bash
+cd .kube
+```
+
+```bash
+sudo cp -R /root/.kube .
+```
+
+```bash
+sudo chown -R $USER:$USER .kube
+```
+
+```bash
+kubectl get pod --all-namespaces
+```
+
 See active nodes and pods:
+
+```bash
 sudo kubectl get nodes
 sudo kubectl get pods -A
 sudo kubectl get pod <pod-name> -n <namespace>
 sudo kubectl describe node <node-name>
+```
+
 Create, examine, and enter into a pod:
 sudo kubectl create –f <pod_A.yaml> -f <pod_B.yaml>
 sudo kubectl describe pod <pod_name>
@@ -400,6 +427,11 @@ Delete a pod:
 sudo kubectl delete –f <pod_A.yaml> -f <pod_B.yaml>
 OR
 sudo kubectl delete pod <pod-name>
+
+```bash
+cd 
+
+```
 
 26
 
