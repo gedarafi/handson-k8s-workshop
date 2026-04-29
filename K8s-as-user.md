@@ -1,15 +1,15 @@
 Workshop: ”Hands-on Kubernetes as a User”
 
-The Presenter
+#The Presenter
 Daniel Medeiros
 daniel.medeiros@ri.se
 Researcher / MIMER and ENCCS
 
-The Helpers (on chat)
+#The Helpers (on chat)
 • Lodovico Giaretta: Researcher at RISE / MIMER
 • Ashwin Mohanan: Researcher at RISE / MIMER
 
-General Guidelines
+#General Guidelines
 •
 •
 •
@@ -27,11 +27,11 @@ Please be patient as live demos might have issues ☺
 
 https://hackmd.io/@mimer-ai/hands-on-k8s/edit
 
-Clone the repo! (link on chat)
+#Clone the repo! (link on chat)
 
 https://github.com/mimer-ai/handson-k8s-workshop
 
-Tentative Schedule
+#Tentative Schedule
 29 Apr 2026
 
 What?
@@ -63,7 +63,7 @@ Hands-on 2: HPC and AI
 
 Q&A
 
-What we are covering and not covering
+#What we are covering and not covering
 • YES: Using Kubernetes and its user interfaces
 • YES: Understanding what are Kubernetes objects and how they
 work
@@ -73,11 +73,11 @@ work
 
 7
 
-We start now ☺
+#We start now ☺
 
 8
 
-Comparing different cloud models
+#Comparing different cloud models
 Cloud IaaS
 
 Traditional HPC
@@ -145,19 +145,19 @@ Engine
 
 9
 
-Cgroups
+#Cgroups
 
 We leverage control groups on Linux, while on other OS (Windows,
 MacOS) we often use a full VM (e.g. Moby Linux).
 10
 
-Container engines
+#Container engines
 
 Image sources: project logos.
 
 11
 
-Container Engines – Docker layers
+#Container Engines – Docker layers
 
 Layering structure
 
@@ -167,7 +167,7 @@ Image sources: docker.io, dev.to.
 
 12
 
-Container Images
+#Container Images
 Base image
 FROM debian:12-slim
 RUN apt-get update --fix-missing \
@@ -193,7 +193,7 @@ Post-build settings
 
 13
 
-Two-Stage Build
+#Two-Stage Build
 FROM golang:1.22 AS builder
 WORKDIR /app
 COPY go.mod go.sum ./
@@ -219,7 +219,7 @@ Execution
 
 14
 
-Architecture and Repository
+#Architecture and Repository
 
 Yes
 
@@ -237,7 +237,7 @@ exists
 This can also allow heterogeneous runs ☺
 15
 
-Docker Execution Model
+#Docker Execution Model
 •
 •
 •
@@ -259,12 +259,12 @@ Docker daemon
 Linux kernel
 16
 
-But this is only for
+#But this is only for
 one node so far...
 
 17
 
-What should I use Kubernetes for?
+#What should I use Kubernetes for?
 Stockholm
 Used: 20
 Available: 16
@@ -293,14 +293,14 @@ them
 
 18
 
-(Some) Kubernetes Flavors
+#(Some) Kubernetes Flavors
 
 Also several clients: Python, Go, Java, C, others…
 
 Another orchestrators:
 19
 
-Architecture of a Kubernetes Cluster
+#Architecture of a Kubernetes Cluster
 Always need:
 • api-server
 • scheduler
@@ -314,7 +314,7 @@ Addons:
 
 20
 
-Structure of a Kubernetes object
+#Structure of a Kubernetes object
 apiVersion:
 kind:
 metadata:
@@ -322,7 +322,7 @@ spec:
 
 21
 
-Structure of a Kubernetes object
+#Structure of a Kubernetes object
 apiVersion: v1
 kind: Pod
 metadata:
@@ -340,7 +340,7 @@ for long-running applications.
 
 22
 
-Structure of a Kubernetes object
+#Structure of a Kubernetes object
 apiVersion: v1
 • Pods are an abstraction of resources, made
 kind: Pod
@@ -367,7 +367,7 @@ cpu: ”500m”
 
 23
 
-How the scheduler works?
+#How the scheduler works?
 Two Phases:
 1. Scheduling, where the scheduler filters (based on resources, taints
 and others) and scoring (uses a scoring function to determine the
@@ -378,18 +378,28 @@ Source: kubernetes.io
 
 24
 
-Requests vs Limits
+#Requests vs Limits
 
 Source: shipit.dev
 
 25
 
-26: Let’s start our cluster and use our first kubectl
+# 26: Let’s start our cluster and use our first kubectl
 
 Create cluster in k3d:
 
 ```bash
 sudo k3d cluster create my-cluster
+```
+
+```bash
+k3d cluster list
+```
+
+```bash
+k3d cluster delete my-cluster
+k3d cluster delete mycluster
+k3d cluster delete my-cluster2
 ```
 
 ## How to run kubectl as a non-root user?
@@ -407,19 +417,54 @@ sudo chown -R $USER:$USER .kube
 ```
 
 ```bash
-kubectl get pod --all-namespaces
+alias k=kubectl
 ```
+
+
 
 See active nodes and pods:
 
 ```bash
 sudo kubectl get nodes
+```
+
+
+```bash
+kubectl get pods -A
+```
+
+```text
+E0429 08:28:33.505122   70234 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+E0429 08:28:33.505987   70234 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+E0429 08:28:33.507613   70234 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+E0429 08:28:33.508079   70234 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+E0429 08:28:33.509673   70234 memcache.go:265] "Unhandled Error" err="couldn't get current server API group list: Get \"http://localhost:8080/api?timeout=32s\": dial tcp 127.0.0.1:8080: connect: connection refused"
+The connection to the server localhost:8080 was refused - did you specify the right host or port?
+```
+
+```bash
 sudo kubectl get pods -A
+```
+
+```text
+NAMESPACE     NAME                                      READY   STATUS      RESTARTS   AGE
+kube-system   coredns-ccb96694c-ck4hs                   1/1     Running     0          116s
+kube-system   helm-install-traefik-bf22n                0/1     Completed   1          116s
+kube-system   helm-install-traefik-crd-lndvj            0/1     Completed   0          116s
+kube-system   local-path-provisioner-5cf85fd84d-db6c6   1/1     Running     0          116s
+kube-system   metrics-server-5985cbc9d7-ltj8w           1/1     Running     0          116s
+kube-system   svclb-traefik-7184fc02-7mczc              2/2     Running     0          75s
+kube-system   traefik-5d45fc8cc9-m2bbl                  1/1     Running     0          75s
+```
+
+```bash
 sudo kubectl get pod <pod-name> -n <namespace>
 sudo kubectl describe node <node-name>
 ```
 
 Create, examine, and enter into a pod:
+
+```bash
 sudo kubectl create –f <pod_A.yaml> -f <pod_B.yaml>
 sudo kubectl describe pod <pod_name>
 sudo kubectl exec –it <pod_name> -- /bin/bash
@@ -427,19 +472,43 @@ Delete a pod:
 sudo kubectl delete –f <pod_A.yaml> -f <pod_B.yaml>
 OR
 sudo kubectl delete pod <pod-name>
-
-```bash
-cd 
-
 ```
 
-26
+## Deploy application
 
-Other interesting commands:
-•
-•
+```bash
+cd scripts
+```
 
-kubectl explain: see help
+```bash
+cat 01A_Pod_nginx.yaml
+```
+
+```bash
+sudo kubectl create -f 01A_Pod_nginx.yaml
+```
+
+```bash
+sudo kubectl delete -f 01A_Pod_nginx.yaml
+```
+
+```bash
+kubectl create -f 02_Pod_with_resources.yaml
+```
+
+```bash
+kubectl get pod --all-namespaces
+```
+
+## 
+
+# 27 Other interesting commands:
+
+```bash
+# see help
+kubectl explain pods
+```
+
 kubectl edit: edit existing object
 Kubectl create
 
@@ -491,37 +560,49 @@ get same result)
 Yes
 
 Yes
-27
+ 27
 
-28
+#28
 
-Attaching volumes in a pod
+# Attaching volumes in a pod
+
+```yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-name: busybox-pv
+  name: busybox-pv
 spec:
-capacity:
-Persistent Volume
-storage: 1Gi
-accessModes:
-ReadWriteMany, ReadOnlyMany
-- ReadWriteOnce
-persistentVolumeReclaimPolicy: Retain
-Delete, Recycle
-storageClassName: local-path
-Standard, longhorn, nfs-client, etc
-hostPath:
-path: /your/path/here
+  capacity:
+  Persistent Volume
+  storage: 1Gi
+  accessModes:
+  ReadWriteMany, ReadOnlyMany
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  Delete, Recycle
+  storageClassName: local-path
+  Standard, longhorn, nfs-client, etc
+  hostPath:
+  path: /your/path/here
+```
 
 Persistent Volume
 
 Attach to object
 
 Since we are in k3d, we need to create the cluster with –volume flag
-sudo k3d cluster create my-cluster --volume /home/daniel/handson-k8s-workshop/volumes:/pv-data@all 29
 
-Attaching volumes in a pod
+```bash
+sudo k3d cluster create my-cluster2 --volume $HOME/repos/handson-k8s-workshop/persistent-volume:/pv-data@all
+```
+
+```bash
+kubectl get pod
+```
+
+# Attaching volumes in a pod
+
+```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -533,16 +614,15 @@ storageClassName: local-path
 resources:
 requests:
 storage: 1Gi
+```
+Persistent Volume -> Persistent Volume -> Attach to object
 
-Persistent Volume
+```bash
+kubectl create -f 03_Pod_with_PV.yaml
+```
 
-Persistent Volume
+# Attaching volumes in a pod
 
-Attach to object
-
-30
-
-Attaching volumes in a pod
 containers: .......
 volumeMounts:
 - name: persistent-storage
@@ -560,23 +640,41 @@ Attach to object
 
 31
 
-32
+# 32
 
-Taints and Tolerations
+# Taints and Tolerations
 
 Source: Zesty.co
+
 33
 
-Let’s test the taints and tolerations!
+# Let’s test the taints and tolerations!
 Create a new node in k3d:
-sudo k3d node create worker -c <cluster-name>
+
+```bash
+sudo k3d node create worker -c my-cluster2
+```
+
+```bash
+sudo kubectl get nodes
+```
+
+```bash
+sudo kubectl describe node k3d-worker-0
+```
+
 Label the node (optional):
-sudo kubectl label node <node-name> node-role.kubernetes.io/worker=
+
+```bash
+sudo kubectl label node k3d-worker-0 gpuuu=true
+```
+
 Taint the node:
 sudo kubectl taint node <node-name> key1=value1:NoSchedule
 34
 
-Add the toleration
+# Add the toleration
+
 containers: .......
 tolerations:
 - key: "key1"
@@ -589,20 +687,37 @@ NoExecute
 
 35
 
-Let’s test the taints and tolerations!
+```bash
+sudo kubectl create -f 04_Pod_with_Tolerance.yaml
+```
+
+```bash
+sudo kubectl get pod -o wide
+```
+
+```bash
+sudo kubectl delete -f 04_Pod_with_Tolerance.yaml
+```
+
+# Let’s test the taints and tolerations!
+
 Delete the taint:
+
+```bash
 sudo kubectl taint node <node-name> key1=value1-
+```
 
 36
 
-Node Affinity
+# Node Affinity
 
 Source: Apptio
 Source: Linuxhandbook.com
 
 37
 
-NodeSelector
+# NodeSelector
+
 Add a label:
 sudo kubectl label node k3d-worker-0 gpu=true
 
@@ -618,7 +733,7 @@ command: ["sleep", "3600"]
 Remove a label:
 sudo kubectl label node k3d-worker-0 gpu38
 
-NodeAffinity
+#NodeAffinity
 Add a label:
 sudo kubectl label node k3d-worker-0 gpu=true
 
@@ -640,34 +755,28 @@ Required vs preferred: hard vs soft rule
 Remove a label:
 sudo kubectl label node k3d-worker-0 gpu39
 
-40
+#40
 
-ReplicaSet
-apiVersion: apps/v1
-kind: ReplicaSet
-metadata:
-name: nginx-rs
-spec:
-replicas: 3
-selector:
-matchLabels:
-app: nginx
-template:
-metadata:
-labels:
-app: nginx
-spec:
-containers:
-- name: nginx
-image: nginx
+# ReplicaSet
 
-• Keeps the number of pods all the time
+```bash
+sudo kubectl create -f 06_ReplicaSet.yaml
+```
 
-Pretty much a pod
+```bash
+sudo kubectl get replicaset
+```
+
+```bash
+sudo kubectl get pods -o wide
+```
+
 
 41
 
-DaemonSet
+# DaemonSet
+
+```yaml
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -684,6 +793,7 @@ spec:
 containers:
 - name: nginx
 image: nginx
+```
 
 • One pod per node! (that’s why no
 number of replicas here)
@@ -693,9 +803,24 @@ new node = one new replica)
 
 Pretty much a pod
 
+```bash
+sudo kubectl delete -f 07_DaemonSet.yaml
+```
+
+```bash
+sudo kubectl get daemonset
+```
+
+```bash
+sudo kubectl get ds
+```
+
+
+
 42
 
-Deployment
+# Deployment
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -720,30 +845,61 @@ and Rollback.
 These are for stateless applications,
 where each pod is equal!
 
+```bash
+sudo kubectl create -f 08_Deployment.yaml
+```
+
+```bash
+sudo kubectl get deployment
+```
+
+```bash
+sudo kubectl get deploy
+```
+
 43
 
-Namespaces
+# Namespaces
+
 • In multi-tenant clusters, you are often
 restricted to your own namespace.
 • Alternatively:
-kubectl create namespace my-namespace
 
+```bash
+sudo kubectl create namespace my-namespace
+```
+
+```yaml
 apiVersion: v1
 kind: Namespace
 metadata:
 name: my-namespace
+```
 
 Execute pods with the –n flag if necessary:
 Kubectl create –f <file.yaml> -n mynamespace
 Leave your namespace as default:
 kubectl config set-context --current -namespace=my-namespace
 
+```bash
+sudo kubectl get pods -n my-namespace
+```
+
+```bash
+sudo kubectl get ns
+```
+
+```bash
+sudo watch kubectl get pods
+```
+
 44
 
-Jobs
+# Jobs
+
 • Designed for finite-running tasks
 • Relevant attributes:
-• backOffLimit: How many times to retry
+• backOffLimit: How many times to retry 
 after failure
 • Completions: How many times it
 should succeed
@@ -752,6 +908,7 @@ parallel
 • activeDeadlineSeconds: Kill the job
 after X seconds.
 
+```bash
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -774,9 +931,13 @@ echo "Computing something..."
 echo "1 + 1 = 2"
 echo "Job finished at $(date)"
 backoffLimit: 3
+```
+
+
+
 45
 
-Let’s test the different apps!
+#Let’s test the different apps!
 Create more nodes in k3d:
 sudo k3d node create worker -c <cluster-name>
 Then just execute the yaml files to see the replicaset and daemonset!
@@ -786,7 +947,7 @@ sudo kubectl logs <pod-name>
 
 46
 
-Let’s test rolling out and back for Deploy!
+#Let’s test rolling out and back for Deploy!
 Create the deployment:
 sudo kubectl create -f 10_Deployment_with_RollingUpdates.yaml
 Change the yaml file with a new version of nginx (e.g. 1.26), and:
@@ -797,61 +958,73 @@ kubectl rollout undo deployment/nginx-deploy
 
 47
 
-48
+#48
 
-Kubernetes Networking Model
+# Kubernetes Networking Model
+
 
 Image sources: inovex.de.
 
 49
 
-Kubernetes Networking Model - CNI
+# Kubernetes Networking Model - CNI
 
 Calico
 • For production environment
 • Advanced network policy control
 • Observability, encryption
 
-•
-•
-•
-•
+flannel
 
-Simple setups
-Limited scalability
-No network policy support
-No encryption, no observability
+* Simple setups
+* Limited scalability
+* No network policy support
+* No encryption, no observability
 
 That’s the one used defautly by k3d
 
 50
 
-Services – Why?
+# Services – Why?
+
 So A wants to talk with B.
 
 Without Service:
-Pod B IP = 10.0.0.2 ──► Pod B crashes and restarts
-Pod B IP = 10.0.0.8 ──► Pod A is now talking to the wrong IP
+  Pod B IP = 10.0.0.2 ──► Pod B crashes and restarts
+  Pod B IP = 10.0.0.8 ──► Pod A is now talking to the wrong IP
 With Service:
-Service IP = 10.96.0.45 ──► always the same, always routes to healthy pods
+  Service IP = 10.96.0.45 ──► always the same, always routes to healthy pods
+
 It also load balances, allows DNS as well.
+
 A pod DNS: 10-0-0-2.default.pod.cluster.local
 A service DNS: nginx-svc.default.svc.cluster.local
 
 51
 
-Services
+# Services
+
 Every LB has a NodePort, every NodePort has a
 ClusterIP. K3d has a default LB but there are
 many others.
+
 Port Range:
 • ClusterIP: Any
 • NodePort: 30000 – 32767
 • LB: Any
 
+K8s Service Types:
+* ClusterIP
+* NodePort
+* LoadBalancer
+* ExternalName
+
+
 52
 
-Services
+# Services
+
+```yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -865,7 +1038,9 @@ ports:
 protocol: TCP
 port: 80
 targetPort: 80
+```
 
+```yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -880,7 +1055,9 @@ protocol: TCP
 port: 80
 targetPort: 80
 nodePort: 30080
+```
 
+```yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -894,20 +1071,29 @@ ports:
 protocol: TCP
 port: 80
 targetPort: 80
+```
 
 53
 
-Services
+# Services
 
 Source: StackOverflow
 54
 
-Services - DNS
+# Services - DNS
+
 The full DNS:
 <pod-ipv4-address>.<service-name>.<my-namespace>.svc.<cluster-domain.example>
+
 Get pod IP via:
+
+```bash
 sudo kubectl get pod –o wide
+```
+
+```bash
 sudo kubectl create –f 12B_Service_NodePort.yaml
+```
 
 Login into a non-service pod:
 sudo kubectl exec –it curl-pod – sh
@@ -918,14 +1104,14 @@ Run, for testing:
 
 55
 
-Port forward
+# Port forward
 
 Expose the port from a kubernetes pod/service to you.
 Creates a tunnel through the K8S Api server to the pod/svc
 
 56
 
-Port forward
+# Port forward
 From a service:
 sudo kubectl port-forward svc/nginx-nodeport 8080:80
 From the deployment (random pod):
@@ -935,7 +1121,9 @@ sudo kubectl port-forward pod/<pod-name> 8080:80
 
 57
 
-StatefulSets
+# StatefulSets
+
+```yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -965,7 +1153,9 @@ accessModes: ["ReadWriteOnce"]
 resources:
 requests:
 storage: 1Gi
+```
 
+```yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -976,6 +1166,7 @@ selector:
 app: nginx
 ports:
 - port: 80
+```
 
 •
 •
@@ -998,7 +1189,12 @@ regardless)
 
 58
 
-Ingress
+# Ingress
+
+* It's different for each cloud provider.
+* Use to access services from outside the cluster.
+
+```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -1017,6 +1213,7 @@ service:
 name: nginx-svc
 port:
 number: 80
+```
 
 Which ingress handles the rule
 Request only matches this header
@@ -1029,7 +1226,8 @@ Other ingress for example is the nginx one:
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.0/deploy/static/provider/cloud/deploy.yaml
 59
 
-Ingress
+# Ingress
+
 Create a new k3d cluster with support to Ingress points:
 sudo k3d cluster create my-cluster --port "8080:80@loadbalancer"
 (if you are using a managed cluster, chances are this is already done to you)
@@ -1041,14 +1239,50 @@ Alternatively, curl http://localhost:8080 -H "Host: nginx.local"
 
 60
 
-61
+# Demo
 
-ServiceAccount
+```bash
+sudo kubectl delete -f 12B_Service_NodePort.yaml
+```
+
+```bash
+sudo kubectl get pods
+```
+
+```bash
+sudo kubectl get pv
+```
+
+```bash
+sudo k3d cluster delete my-cluster2 my-cluster
+```
+
+```bash
+sudo k3d cluster create my-cluster --port "8080:80@loadbalancer"
+```
+
+```bash
+sudo kubectl create -f 14_Ingress.yaml
+```
+
+```bash
+curl http://nginx.local:8080
+```
+
+```bash
+sudo kubectl get pods -o wide
+```
+
+
+# ServiceAccount
+
+```yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
 name: my-service-account
---apiVersion: v1
+--
+apiVersion: v1
 kind: Pod
 metadata:
 name: sa-pod
@@ -1058,12 +1292,41 @@ containers:
 - name: alpine
 image: alpine
 command: ["sleep", "3600"]
+```
+
+```bash
+sudo kubectl create -f 15_ServiceAccount.yaml
+```
+
+```bash
+sudo kubectl get serviceaccount
+```
 
 • An user account but for non-humans
 • Have access to the Kubernetes API as well ☺
+
 Give it permissions:
-kubectl create rolebinding msa-readonly --clusterrole=view -serviceaccount=default:my-service-account -namespace=default
+
+```bash
+sudo kubectl create rolebinding msa-readonly --clusterrole=view -serviceaccount=default:my-service-account -namespace=default
+```
+
+```bash
+sudo kubectl exec -it sa-pod -- /bin/sh
+```
+
+```text
+# cd run
+# cd secrets
+# cd kubernetes.io
+# cd serviceaccount
+# ls
+ca.crt  namespace  token
+# cat token
+```
+
 Login into the pod and try:
+
 TOKEN=$(cat
 /var/run/secrets/kubernetes.io/serviceaccount/token)
 CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.c
@@ -1074,9 +1337,9 @@ ods
 You can even install kubectl and run there!
 62
 
-RBAC
+# RBAC - Role-Based Access Control
 
-Role-Based Access Control
+```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -1104,11 +1367,16 @@ roleRef:
 kind: Role
 name: pod-reader
 apiGroup: rbac.authorization.k8s.io
+```
 
 See your user (if using kind: User):
+
+```bash
 kubectl config view --raw -o
 jsonpath='{.users[0].user.clientcertificate-data}' | \ base64 -d | \ openssl
 x509 -noout –subject
+```
+
 (Return on k3d will be CN=admin)
 * You can also use a ServiceAccount, or
 create new users/keys for limited
@@ -1116,7 +1384,9 @@ permissions as well.
 
 63
 
-ConfigMaps & Secrets
+# ConfigMaps & Secrets
+
+```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -1128,7 +1398,9 @@ config.yaml: |
 server:
 port: 8080
 debug: false
+```
 
+```yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -1138,6 +1410,7 @@ type: Opaque
 stringData:
 DB_PASSWORD: "supersecret"
 API_KEY: "abc123"
+```
 
 • Contains data that can be read-only
 mounted to a system
@@ -1160,7 +1433,21 @@ The base64 is in etcd! Restrict secrets with
 64
 RBAC!
 
-PriorityClass
+```bash
+sudo kubectl create -f 17_ConfigMap.yaml
+```
+
+```bash
+sudo kubectl create -f 18_Secret.yaml
+```
+
+```bash
+
+```
+
+# PriorityClass
+
+```yaml
 apiVersion:
 scheduling.k8s.io/v1
 kind: PriorityClass
@@ -1172,6 +1459,7 @@ globalDefault: false
 description: "This priority
 class will not cause other
 pods to be preempted."
+```
 
 • Ensure which pods will be scheduled first ☺
 • Two default priorities in k8s: system-cluster-critical and
@@ -1179,7 +1467,9 @@ system-node-critical
 
 65
 
-HorizontalPodAutoscaler
+# HorizontalPodAutoscaler
+
+```yaml
 apiVersion: autoscaling/v2
 apiVersion:
 autoscaling/v2
@@ -1219,10 +1509,27 @@ averageUtilization:
 target:
 type: Utilization
 averageUtilization: 50
+```
+
+```bash
+sudo kubectl create -f 20_HPA.yaml
+```
+
+```bash
+sudo kubectl run load-generator \
+  --image=busybox \
+  --restart=Never \
+  -- sh -c "while true; do wget -q -O- http://nginx-svc; done"
+```
+
+```bash
+watch sudo kubectl top pods
+```
 
 66
 
-Testing the HPA!
+# Testing the HPA!
+
 Start the HPA + Pod script!
 Create a load generator:
 kubectl run load-generator --image=busybox \ --restart=Never \ -- sh -c "while true; do wget -q -O- http://nginx-svc; done“
@@ -1235,27 +1542,31 @@ kubectl get pods -w
 
 67
 
-Briefly: Custom Resource Definition (CRD)
+# Briefly: Custom Resource Definition (CRD)
+
 https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
 
 68
 
-...Maybe?
+#...Maybe?
+
 69
 
-70
+#70
 
-Jupyterhub, Prometheus and Grafana
+# Jupyterhub, Prometheus and Grafana
 
 71
 
-Helm
-A package manager for Kubernetes ☺
+# Helm - A package manager for Kubernetes ☺
+
 To install:
 
+```bash
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4
 chmod 700 get_helm.sh
 ./get_helm.sh
+```
 
 Or:
 
@@ -1263,6 +1574,7 @@ brew install helm
 
 Or:
 
+```bash
 sudo apt-get install curl gpg apt-transport-https --yes
 curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | sudo tee
 /usr/share/keyrings/helm.gpg > /dev/null
@@ -1270,26 +1582,37 @@ echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.co
 main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
 sudo apt-get update
 sudo apt-get install helm
-
+```
 72
 
-Jupyterhub
+# Jupyterhub
+
+```bash
 helm repo add jupyterhub https://hub.jupyter.org/helm-chart/
 helm repo update
+```
 
+```bash
 helm upgrade --cleanup-on-fail \
---install <helm-release-name> jupyterhub/jupyterhub \
---namespace <k8s-namespace> \
+--install helm-release-name jupyterhub/jupyterhub \
+--namespace default \
 --create-namespace \
---version=<chart-version> \
+--version=1.0.0 \
 --values config.yaml
+```
+
 Port forward it:
-kubectl port-forward svc/proxy-public 8888:80
+
+```bash
+sudo kubectl port-forward svc/proxy-public 8888:80
+```
+
 (put an ingress if on an actual cluster)
 
 See releases using helm list.
 To remove, helm uninstall <release-name>
 To see values: helm get values<release-name>
+
 
 values.yaml:
 hub:
@@ -1303,16 +1626,26 @@ https://z2jh.jupyter.org/en/stable/jupyterhub/customizi
 ng/extending-jupyterhub.html
 73
 
-Prometheus Architecture
+# Prometheus Architecture
+
+```bash
+kubectl get pods -n default
+```
 
 74
 
-Prometheus Data format
+# Prometheus Data format
+
 Normal format:
+
+```text
 # HELP <metric_name> <description>
 # TYPE <metric_name>
 <type> <metric_name>{<label_key>="<label_value>", ...} <value> [timestamp]
+```
+
 Examples:
+```text
 # HELP http_requests_total Total number of HTTP requests
 # TYPE http_requests_total counter
 http_requests_total{method="GET", status="200", service="api"} 1027
@@ -1321,6 +1654,7 @@ http_requests_total{method="POST", status="500", service="api"} 3
 # TYPE cpu_usage_percent gauge
 cpu_usage_percent{host="node-1"} 72.4
 cpu_usage_percent{host="node-2"} 45.1
+```
 
 Type
 
@@ -1350,28 +1684,47 @@ Same as above
 but with
 quantities75
 
-Let’s deploy Prometheus & Grafana
+# Let’s deploy Prometheus & Grafana
+
 Install through helm:
-helm install <release-name> oci://ghcr.io/prometheus-community/charts/kube-prometheus-Stack
+
+```bash
+sudo helm install prom-stack oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
+```
+
+```bash
+sudo kubectl get pods -n default
+```
+
 Access Prometheus UI:
-kubectl port-forward svc/<release-name>-kube-prom-prometheus 9090:9090
+
+```bash
+sudo kubectl port-forward svc/prom-stack-kube-prom-prometheus 9090:9090
+```
+
 • Look for a metric like http_requests_total or container_cpu_usage_seconds_total ☺
 • Use submetric like avg()
+
 Access Grafana UI:
-kubectl --namespace default get secrets <release-name>-grafana -o jsonpath="{.data.admin-password}" |
+
+```bash
+sudo kubectl --namespace default get secrets prom-stack-grafana -o jsonpath="{.data.admin-password}" |
 base64 -d ; echo
-kubectl port-forward svc/<release-name>-grafana 3000:80
+sudo kubectl port-forward svc/prom-stack-grafana 3000:80
 Kube-state-metrics is deployed as well: https://github.com/kubernetes/kube-state-metrics
+```
+
 ...Alternatively you can scrape directly from a kubelet too via the Kubernetes API (e.g. Python, go, etc).
 
 76
 
-To add into Prometheus:
+# To add into Prometheus:
+
 Push yourself:
 Need to install pushgateway first!
-helm install <release-name> oci://ghcr.io/prometheus-community/charts/prometheus-pushgateway
+helm install my_release_name oci://ghcr.io/prometheus-community/charts/prometheus-pushgateway
 Then, every time you need to push:
-kubectl port-forward svc/pushgateway-prometheus-pushgateway 9091:9091
+kubectl port-forward svc/my_release_name-kube-prom-pushgateway 9091:9091
 echo "my_metric 42" | curl --data-binary @- http://localhost:9091/metrics/job/test_job
 
 Type
@@ -1419,11 +1772,11 @@ endpoints:
 interval: 30s
 path: /metrics
 
-HPC and AI
+# HPC and AI
 
 78
 
-Volcano and MPI (Distributed Applications)
+# Volcano and MPI (Distributed Applications)
 
 ssh
 
@@ -1437,7 +1790,7 @@ Workers:
 
 79
 
-Kubernetes YAML for jobs
+#Kubernetes YAML for jobs
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -1458,7 +1811,7 @@ restartPolicy: OnFailure
 
 80
 
-Install Volcano!
+# Install Volcano!
 Execute helm:
 helm repo add volcano-sh https://volcano-sh.github.io/helm-charts
 helm install <release-name> volcano-sh/volcano -n volcano-system --create-namespace
@@ -1466,13 +1819,47 @@ Run a distributed application!
 
 81
 
-vLLM demonstration in a real cluster ☺
+# vLLM demonstration in a real cluster ☺
+
+```bash
+sudo kubectl config set-context --current --namespace=default
+```
+
+```bash
+sudo kubectl create -f pvc.yaml
+```
+
+```bash
+sudo kubectl create -f unsloth-devstral-small-downloader.yaml
+```
+
+```bash
+sudo kubectl logs model-small-downloader-f2d6z
+```
+
+```bash
+sudo kubectl get job
+```
+
+```bash
+sudo kubectl get pod
+```
+
+```bash
+sudo kubectl describe pod model-small-downloader-f2d6z
+```
+
+```bash
+sudo kubectl create -f devstral2-small.yaml -ns default
+```
+
 
 82
 
-Thank you for today!
+# Thank you for today!
+
 We’ll later send an e-mail to you, feedback will be really appreciated!
 
 83
 
-
+#
