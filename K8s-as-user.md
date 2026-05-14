@@ -600,21 +600,9 @@ sudo k3d cluster create my-cluster2 --volume $HOME/repos/handson-k8s-workshop/pe
 kubectl get pod
 ```
 
-# Attaching volumes in a pod
+# [Attaching volumes in a pod](./scripts/03_Pod_with_PV.yaml)
 
-```yaml
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-name: busybox-pvc
-spec:
-accessModes:
-- ReadWriteOnce
-storageClassName: local-path
-resources:
-requests:
-storage: 1Gi
-```
+@import "scripts/03_Pod_with_PV.yaml" {class="line-numbers"}
 Persistent Volume -> Persistent Volume -> Attach to object
 
 ```bash
@@ -771,26 +759,9 @@ sudo kubectl get pods -o wide
 
 
 
-# DaemonSet
+# [DaemonSet](./scripts/07_DaemonSet.yaml)
 
-```yaml
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-name: nginx-ds
-spec:
-selector:
-matchLabels:
-app: nginx
-template:
-metadata:
-labels:
-app: nginx
-spec:
-containers:
-- name: nginx
-image: nginx
-```
+@import "scripts/07_DaemonSet.yaml" {class="line-numbers"}
 
 • One pod per node! (that’s why no
 number of replicas here)
@@ -816,25 +787,9 @@ sudo kubectl get ds
 
 42
 
-# Deployment
+# [Deployment](./scripts/08_Deployment.yaml)
 
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-name: nginx-deploy
-spec:
-replicas: 3
-selector:
-matchLabels:
-app: nginx
-template:
-metadata:
-labels:
-app: nginx
-spec:
-containers:
-- name: nginx
-image: nginx
+@import "scripts/08_Deployment.yaml" {class="line-numbers"}
 
 • Extends ReplicaSet!
 • Allows you to do Rolling Updates,
@@ -992,54 +947,11 @@ K8s Service Types:
 
 # Services
 
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-name: nginx-clusterip
-spec:
-type: ClusterIP
-selector:
-app: nginx
-ports:
-- name: http
-protocol: TCP
-port: 80
-targetPort: 80
-```
+@import "scripts/12A_Service_ClusterIP.yaml" {class="line-numbers"}
 
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-name: nginx-nodeport
-spec:
-type: NodePort
-selector:
-app: nginx
-ports:
-- name: http
-protocol: TCP
-port: 80
-targetPort: 80
-nodePort: 30080
-```
+@import "scripts/12B_Service_NodePort.yaml" {class="line-numbers"}
 
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-name: nginx-loadbalancer
-spec:
-type: LoadBalancer
-selector:
-app: nginx
-ports:
-- name: http
-protocol: TCP
-port: 80
-targetPort: 80
-```
+@import "scripts/12C_Service_LoadBalancer.yaml" {class="line-numbers"}
 
 53
 
@@ -1089,52 +1001,9 @@ sudo kubectl port-forward pod/<pod-name> 8080:80
 
 57
 
-# StatefulSets
+# [StatefulSets](./scripts/13_StatefulSets.yaml)
 
-```yaml
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-name: nginx
-spec:
-serviceName: nginx-headless
-replicas: 3
-selector:
-matchLabels:
-app: nginx
-template:
-metadata:
-labels:
-app: nginx
-spec:
-containers:
-- name: nginx
-image: nginx
-volumeMounts:
-- name: data
-mountPath: /data
-volumeClaimTemplates:
-- metadata:
-name: data
-spec:
-accessModes: ["ReadWriteOnce"]
-resources:
-requests:
-storage: 1Gi
-```
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-name: nginx-headless
-spec:
-clusterIP: None
-selector:
-app: nginx
-ports:
-- port: 80
-```
+@import "scripts/13_StatefulSets.yaml" {class="line-numbers"}
 
 •
 •
@@ -1162,26 +1031,7 @@ regardless)
 * It's different for each cloud provider.
 * Use to access services from outside the cluster.
 
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-name: nginx-ingress
-spec:
-ingressClassName: traefik
-rules:
-- host: nginx.local
-http:
-paths:
-- path: /
-Patch to be matched (nginx.local/) and how to match it (prefix, Exact)
-pathType: Prefix
-backend:
-service:
-name: nginx-svc
-port:
-number: 80
-```
+@import "scripts/14_Ingress.yaml" {class="line-numbers"}
 
 Which ingress handles the rule
 Request only matches this header
@@ -1242,25 +1092,9 @@ sudo kubectl get pods -o wide
 ```
 
 
-# ServiceAccount
+# [ServiceAccount](./scripts/15_ServiceAccount.yaml)
 
-```yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-name: my-service-account
---
-apiVersion: v1
-kind: Pod
-metadata:
-name: sa-pod
-spec:
-serviceAccountName: my-service-account
-containers:
-- name: alpine
-image: alpine
-command: ["sleep", "3600"]
-```
+@import "scripts/15_ServiceAccount.yaml" {class="line-numbers"}
 
 ```bash
 sudo kubectl create -f 15_ServiceAccount.yaml
@@ -1305,37 +1139,9 @@ ods
 You can even install kubectl and run there!
 62
 
-# RBAC - Role-Based Access Control
+# [RBAC - Role-Based Access Control](./scripts/16_RBAC.yaml)
 
-```yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-name: pod-reader
-namespace: default
-rules:
-- apiGroups: [""]
-This is for the core group API (v1)
-resources: ["pods"]
-Pods, services, nodes, configmaps
-verbs: ["get", "list", "watch"]
-No access to: create, delete, update, patch
---apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-Matches the role to the subject:
-name: pod-reader-binding
-subjects:
-• ServiceAccount
-- kind: User
-• Users
-name: admin
-roleRef:
-• Group
-kind: Role
-name: pod-reader
-apiGroup: rbac.authorization.k8s.io
-```
+@import "scripts/16_RBAC.yaml" {class="line-numbers"}
 
 See your user (if using kind: User):
 
@@ -1352,33 +1158,11 @@ permissions as well.
 
 63
 
-# ConfigMaps & Secrets
+# [ConfigMaps](./scripts/17_ConfigMap.yaml) & [Secrets](./scripts/18_Secret.yaml)
 
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-name: my-config
-data:
-APP_ENV: "production"
-APP_PORT: "8080"
-config.yaml: |
-server:
-port: 8080
-debug: false
-```
+@import "scripts/17_ConfigMap.yaml" {class="line-numbers"}
 
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-name: my-secret
-namespace: default
-type: Opaque
-stringData:
-DB_PASSWORD: "supersecret"
-API_KEY: "abc123"
-```
+@import "scripts/18_Secret.yaml" {class="line-numbers"}
 
 • Contains data that can be read-only
 mounted to a system
@@ -1413,21 +1197,9 @@ sudo kubectl create -f 18_Secret.yaml
 
 ```
 
-# PriorityClass
+# [PriorityClass](./scripts/19_PriorityClass.yaml)
 
-```yaml
-apiVersion:
-scheduling.k8s.io/v1
-kind: PriorityClass
-metadata:
-name: high-prioritynonpreempting
-value: 1000000
-preemptionPolicy: Never
-globalDefault: false
-description: "This priority
-class will not cause other
-pods to be preempted."
-```
+@import "scripts/19_PriorityClass.yaml" {class="line-numbers"}
 
 • Ensure which pods will be scheduled first ☺
 • Two default priorities in k8s: system-cluster-critical and
@@ -1435,49 +1207,9 @@ system-node-critical
 
 65
 
-# HorizontalPodAutoscaler
+# [HorizontalPodAutoscaler](./scripts/20_HPA.yaml)
 
-```yaml
-apiVersion: autoscaling/v2
-apiVersion:
-autoscaling/v2
-kind: HorizontalPodAutoscaler
-kind: HorizontalPodAutoscaler
-metadata:
-metadata: name: nginx-hpa
-name: nginx-hpa
-namespace: default
-spec:
-scaleTargetRef: spec:
-apiVersion:scaleTargetRef:
-apps/v1
-apiVersion: apps/v1
-kind: Deployment
-name: nginx
-kind: Deployment
-minReplicas: name:
-2
-nginx
-maxReplicas:
-10
-minReplicas:
-2
-metrics: maxReplicas: 10
-- type: Resource
-metrics:
-resource:
-- type: Resource
-name: cpu
-resource:
-target:
-name: cpu
-type: Utilization
-averageUtilization:
-50
-target:
-type: Utilization
-averageUtilization: 50
-```
+@import "scripts/20_HPA.yaml" {class="line-numbers"}
 
 ```bash
 sudo kubectl create -f 20_HPA.yaml
@@ -1829,5 +1561,3 @@ sudo kubectl create -f devstral2-small.yaml -ns default
 We’ll later send an e-mail to you, feedback will be really appreciated!
 
 83
-
-#
