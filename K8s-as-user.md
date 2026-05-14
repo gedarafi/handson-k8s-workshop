@@ -500,8 +500,6 @@ kubectl create -f 02_Pod_with_resources.yaml
 kubectl get pod --all-namespaces
 ```
 
-## 
-
 # 27 Other interesting commands:
 
 ```bash
@@ -564,31 +562,8 @@ Yes
 
 #28
 
-# Attaching volumes in a pod
 
-```yaml
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: busybox-pv
-spec:
-  capacity:
-  Persistent Volume
-  storage: 1Gi
-  accessModes:
-  ReadWriteMany, ReadOnlyMany
-  - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  Delete, Recycle
-  storageClassName: local-path
-  Standard, longhorn, nfs-client, etc
-  hostPath:
-  path: /your/path/here
-```
-
-Persistent Volume
-
-Attach to object
+# 29: [Attaching volumes in a pod](./scripts/03_Pod_with_PV.yaml)
 
 Since we are in k3d, we need to create the cluster with –volume flag
 
@@ -596,37 +571,17 @@ Since we are in k3d, we need to create the cluster with –volume flag
 sudo k3d cluster create my-cluster2 --volume $HOME/repos/handson-k8s-workshop/persistent-volume:/pv-data@all
 ```
 
-```bash
-kubectl get pod
-```
-
-# [Attaching volumes in a pod](./scripts/03_Pod_with_PV.yaml)
-
 @import "scripts/03_Pod_with_PV.yaml" {class="line-numbers"}
 Persistent Volume -> Persistent Volume -> Attach to object
+
 
 ```bash
 kubectl create -f 03_Pod_with_PV.yaml
 ```
 
-# Attaching volumes in a pod
-
-containers: .......
-volumeMounts:
-- name: persistent-storage
-mountPath: /data
-volumes:
-- name: persistent-storage
-persistentVolumeClaim:
-claimName: busybox-pvc
-
-Persistent Volume
-
-Persistent Volume
-
-Attach to object
-
-31
+```bash
+kubectl get pod
+```
 
 # 33. Taints and Tolerations
 

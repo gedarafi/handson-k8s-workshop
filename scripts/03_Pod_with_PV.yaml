@@ -8,9 +8,9 @@ spec:
   capacity:
     storage: 1Gi
   accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-path
+    - ReadWriteOnce # ReadWriteOnce, ReadWriteMany, ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain # Retain, Recycle, Delete
+  storageClassName: local-path # Standard longhorn, nfs-client, local-path, etc
   hostPath:
     path: /pv-data   # replace with your actual host path
 ---
