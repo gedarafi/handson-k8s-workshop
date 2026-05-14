@@ -640,13 +640,11 @@ Attach to object
 
 31
 
-# 32
+# 33. Taints and Tolerations
 
-# Taints and Tolerations
+Taint: A property of a node that repels pods that do not tolerate the taint.
+Toleration: A property of a pod that allows it to be scheduled on nodes with matching taints.
 
-Source: Zesty.co
-
-33
 
 # Let’s test the taints and tolerations!
 Create a new node in k3d:
@@ -755,9 +753,9 @@ Required vs preferred: hard vs soft rule
 Remove a label:
 sudo kubectl label node k3d-worker-0 gpu39
 
-#40
+# 41 ReplicaSet
 
-# ReplicaSet
+Keeps a specified number of replicas of a pod running at all times.
 
 ```bash
 sudo kubectl create -f 06_ReplicaSet.yaml
@@ -772,7 +770,6 @@ sudo kubectl get pods -o wide
 ```
 
 
-41
 
 # DaemonSet
 
@@ -893,46 +890,17 @@ sudo kubectl get ns
 sudo watch kubectl get pods
 ```
 
-44
+# 45: [Jobs](./scripts/11_Jobs.yaml)
 
-# Jobs
+* Designed for finite-running tasks
+* Relevant attributes:
+  * backOffLimit: How many times to retry after failure
+  * Completions: How many times it should succeed
+* Parallelism: How many pods run in parallel
+* activeDeadlineSeconds: Kill the job after X seconds.
 
-• Designed for finite-running tasks
-• Relevant attributes:
-• backOffLimit: How many times to retry 
-after failure
-• Completions: How many times it
-should succeed
-• Parallelism: How many pods run in
-parallel
-• activeDeadlineSeconds: Kill the job
-after X seconds.
 
-```bash
-apiVersion: batch/v1
-kind: Job
-metadata:
-name: hello-job
-spec:
-template:
-spec:
-restartPolicy: Never
-containers:
-- name: hello
-image: alpine
-command:
-- sh
-- -c
--|
-echo "Job started at $(date)"
-echo "Running some work..."
-sleep 5
-echo "Computing something..."
-echo "1 + 1 = 2"
-echo "Job finished at $(date)"
-backoffLimit: 3
-```
-
+@import "scripts/11_Jobs.yaml" {class="line-numbers"}
 
 
 45
