@@ -1287,8 +1287,6 @@ ng/extending-jupyterhub.html
 kubectl get pods -n default
 ```
 
-74
-
 # Prometheus Data format
 
 Normal format:
@@ -1305,21 +1303,16 @@ Examples:
 # TYPE http_requests_total counter
 http_requests_total{method="GET", status="200", service="api"} 1027
 http_requests_total{method="POST", status="500", service="api"} 3
+
 # HELP cpu_usage_percent CPU usage percentage
 # TYPE cpu_usage_percent gauge
 cpu_usage_percent{host="node-1"} 72.4
 cpu_usage_percent{host="node-2"} 45.1
 ```
 
-Type
-
-Use cases
-
-counter
-
-Only goes up
-(errors,
-requests)
+|Type|Use cases|
+|--|--|
+|counter| Only goes up (errors, requests)|
 
 gauge
 
@@ -1344,7 +1337,7 @@ quantities75
 Install through helm:
 
 ```bash
-sudo helm install prom-stack oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
+sudo helm install prometheus-stack oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
 ```
 
 ```bash
@@ -1354,7 +1347,7 @@ sudo kubectl get pods -n default
 Access Prometheus UI:
 
 ```bash
-sudo kubectl port-forward svc/prom-stack-kube-prom-prometheus 9090:9090
+sudo kubectl port-forward svc/prometheus-stack-kube-prom-prometheus 9090:9090
 ```
 
 • Look for a metric like http_requests_total or container_cpu_usage_seconds_total ☺
